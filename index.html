@@ -25,7 +25,7 @@ a{color:inherit;text-decoration:none}
 .logo{display:block}
 
 /* Màn hình chờ: chạm để logo xuất hiện */
-#splash{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .9s cubic-bezier(.76,0,.24,1),opacity .6s ease .3s}
+#splash{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .9s cubic-bezier(.76,0,.24,1),opacity .6s ease .3s}
 #splash.done{transform:translateY(-100%);opacity:0;pointer-events:none}
 #hint{position:absolute;bottom:calc(48px + env(safe-area-inset-bottom,0px));color:var(--mute);font-size:14px;letter-spacing:.04em;transition:opacity .3s}
 #stage{display:flex;flex-direction:column;align-items:center;width:min(78vw,420px);opacity:0}
@@ -208,13 +208,13 @@ body::before{content:"";position:fixed;left:-20%;right:-20%;bottom:-30%;height:6
 </main>
 <footer class="credit">tetomidi is a website built by xiubell.</footer>
 
-<div id="splash" role="button" tabindex="0" aria-label="Tap to enter tetomidi">
+<div id="splash">
   <div id="stage">
     <img class="logo" alt="" data-logo>
     <h1>teto<i>midi</i></h1>
     <div class="bar"><b></b></div>
   </div>
-  <div id="hint">Tap to enter</div>
+  <div id="hint"></div>
 </div>
 
 <script>
@@ -235,8 +235,7 @@ document.querySelectorAll("[data-logo]").forEach(function(i){i.src=LOGO});
       document.body.style.overflow='';
     },2200);
   }
-  splash.addEventListener('click',enter);
-  splash.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();enter();}});
+  enter();
 
   function toggle(open){
     burger.setAttribute('aria-expanded',open);
