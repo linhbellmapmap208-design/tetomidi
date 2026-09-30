@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>MIDI player · tetomidi</title>
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--ink:#fff;--mute:#8d8a80;--line:#262624;--serif:"Instrument Serif","Times New Roman",serif;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+body{display:flex;flex-direction:column;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid #fff;outline-offset:3px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px max(16px,3vw);border-bottom:1px solid var(--line)}
+.back{display:flex;align-items:center;gap:6px;font:400 26px/1 var(--serif)}
+.back img{width:40px;height:40px;object-fit:contain;margin-left:-6px}
+.back i{font-style:italic}
+#file{color:var(--mute);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+#wrap{position:relative;flex:1;min-height:0}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;pointer-events:none}
+#empty b{font:400 clamp(28px,7vw,44px)/1.1 var(--serif)}
+#empty span{color:var(--mute);font-size:15px}
+#wrap.drag{outline:1px dashed #fff;outline-offset:-12px}
+footer{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;padding:14px max(16px,3vw);border-top:1px solid var(--line)}
+button,.btn{font:500 14px var(--sans);color:var(--ink);background:none;border:1px solid #333;border-radius:999px;padding:10px 18px;cursor:pointer;transition:border-color .2s}
+button:hover,.btn:hover{border-color:#fff}
+#play{background:#fff;color:#000;border-color:#fff;min-width:96px}
+#seek{flex:1 1 200px;order:5;accent-color:#fff;height:24px}
+#time{order:6;font-variant-numeric:tabular-nums;color:var(--mute);font-size:14px;min-width:86px;text-align:right}
+
+/* Liquid glass */
+button,.btn{background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.04));-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:inset 1px 1px 0 rgba(255,255,255,.4),inset -1px -1px 0 rgba(255,255,255,.08),inset 0 0 14px rgba(255,255,255,.05),0 10px 28px rgba(0,0,0,.55);transition:transform .3s cubic-bezier(.2,.9,.3,1.3),background .25s,box-shadow .25s}
+button:hover:not(:disabled),.btn:hover{background:linear-gradient(135deg,rgba(255,255,255,.28),rgba(255,255,255,.08));transform:translateY(-1px) scale(1.04)}
+button:active:not(:disabled),.btn:active{transform:scale(.96)}
+button,.btn{color:#fff;border-radius:999px}
+#play{background:linear-gradient(135deg,rgba(255,255,255,.4),rgba(255,255,255,.14));color:#fff;border-color:rgba(255,255,255,.3)}
+button:disabled{opacity:.4;cursor:default}
+footer{background:radial-gradient(ellipse at 50% 130%,rgba(255,255,255,.14),transparent 70%)}
+@media (min-width:720px){#seek{order:0}#time{order:0}}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="/" aria-label="Back to the tetomidi home page"><img src="/logo.png" alt=""><span>teto<i>midi</i></span></a>
+  <div id="file" aria-live="polite"></div>
+</header>
+
+<div id="wrap">
+  <canvas id="cv"></canvas>
+  <div id="empty"><b>Drop a MIDI file here</b><span>or press “Open MIDI file” below. Sound comes from the FluidR3 GM soundfont.</span></div>
+</div>
+
+<footer>
+  <label class="btn" for="pick">Open MIDI file</label>
+  <input id="pick" type="file" accept=".mid,.midi,audio/midi,audio/x-midi" hidden>
+  <button id="play" disabled>Play</button>
+  <button id="stop" disabled>Stop</button>
+  <input id="seek" type="range" min="0" max="0" step="0.01" value="0" disabled aria-label="Seek">
+  <div id="time">0:00 / 0:00</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
+<script>
+(function(){
+var GM="acoustic_grand_piano,bright_acoustic_piano,electric_grand_piano,honkytonk_piano,electric_piano_1,electric_piano_2,harpsichord,clavinet,celesta,glockenspiel,music_box,vibraphone,marimba,xylophone,tubular_bells,dulcimer,drawbar_organ,percussive_organ,rock_organ,church_organ,reed_organ,accordion,harmonica,tango_accordion,acoustic_guitar_nylon,acoustic_guitar_steel,electric_guitar_jazz,electric_guitar_clean,electric_guitar_muted,overdriven_guitar,distortion_guitar,guitar_harmonics,acoustic_bass,electric_bass_finger,electric_bass_pick,fretless_bass,slap_bass_1,slap_bass_2,synth_bass_1,synth_bass_2,violin,viola,cello,contrabass,tremolo_strings,pizzicato_strings,orchestral_harp,timpani,string_ensemble_1,string_ensemble_2,synth_strings_1,synth_strings_2,choir_aahs,voice_oohs,synth_choir,orchestra_hit,trumpet,trombone,tuba,muted_trumpet,french_horn,brass_section,synth_brass_1,synth_brass_2,soprano_sax,alto_sax,tenor_sax,baritone_sax,oboe,english_horn,bassoon,clarinet,piccolo,flute,recorder,pan_flute,blown_bottle,shakuhachi,whistle,ocarina,lead_1_square,lead_2_sawtooth,lead_3_calliope,lead_4_chiff,lead_5_charang,lead_6_voice,lead_7_fifths,lead_8_bass__lead,pad_1_new_age,pad_2_warm,pad_3_polysynth,pad_4_choir,pad_5_bowed,pad_6_metallic,pad_7_halo,pad_8_sweep,fx_1_rain,fx_2_soundtrack,fx_3_crystal,fx_4_atmosphere,fx_5_brightness,fx_6_goblins,fx_7_echoes,fx_8_scifi,sitar,banjo,shamisen,koto,kalimba,bagpipe,fiddle,shanai,tinkle_bell,agogo,steel_drums,woodblock,taiko_drum,melodic_tom,synth_drum,reverse_cymbal,guitar_fret_noise,breath_noise,seashore,bird_tweet,telephone_ring,helicopter,applause,gunshot".split(",");
+var $=function(id){return document.getElementById(id)};
+var cv=$("cv"),g=cv.getContext("2d"),wrap=$("wrap"),pick=$("pick"),playB=$("play"),stopB=$("stop"),seek=$("seek"),timeE=$("time"),fileE=$("file"),empty=$("empty");
+var notes=[],dur=0,lo=48,hi=84,ac=null,ready={},playing=false,t0=0,off=0,idx=0,timer=null,W=0,H=0,busy=false;
+var BLACK=[0,1,0,1,0,0,1,0,1,0,1,0];
+function fmt(s){s=Math.max(0,Math.floor(s));return Math.floor(s/60)+":"+("0"+s%60).slice(-2)}
+function ctx(){ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}
+function cur(){return playing?Math.min(ac.currentTime-t0,dur):off}
+
+function resize(){var d=window.devicePixelRatio||1;W=wrap.clientWidth;H=wrap.clientHeight;cv.width=W*d;cv.height=H*d;g.setTransform(d,0,0,d,0,0)}
+window.addEventListener("resize",resize);
+
+async function load(f){
+  if(!f||busy)return;busy=true;pause();off=0;
+  playB.disabled=stopB.disabled=seek.disabled=true;fileE.textContent="Reading "+f.name+"…";
+  try{
+    var M=window.Midi&&window.Midi.Midi?window.Midi.Midi:window.Midi;
+    var m=new M(await f.arrayBuffer()),progs={};notes=[];
+    m.tracks.forEach(function(tr){
+      if(tr.instrument.percussion||!tr.notes.length)return;
+      var p=tr.instrument.number;progs[p]=1;
+      tr.notes.forEach(function(n){notes.push({m:n.midi,t:n.time,d:n.duration,v:n.velocity,p:p})});
+    });
+    if(!notes.length)throw new Error("empty");
+    notes.sort(function(a,b){return a.t-b.t});
+    dur=0;lo=127;hi=0;
+    notes.forEach(function(n){dur=Math.max(dur,n.t+n.d);lo=Math.min(lo,n.m);hi=Math.max(hi,n.m)});
+    lo-=1;hi+=1;while(hi-lo<23){lo--;hi++}
+    empty.style.display="none";seek.max=dur;seek.value=0;
+    fileE.textContent="Loading soundfont…";
+    ctx();
+    await Promise.all(Object.keys(progs).map(async function(p){
+      ready[p]=ready[p]||await Soundfont.instrument(ac,GM[p]||GM[0]);
+    }));
+    fileE.textContent=f.name;
+    playB.disabled=stopB.disabled=seek.disabled=false;
+  }catch(e){
+    notes=[];dur=0;empty.style.display="";
+    fileE.textContent=e.message==="empty"?"This file has no notes":"Couldn't open the file or load the soundfont. Check your connection and try again.";
+  }
+  busy=false;
+}
+
+function sched(){
+  var now=ac.currentTime-t0;
+  while(idx<notes.length&&notes[idx].t<now+0.3){
+    var n=notes[idx++],p=ready[n.p];
+    if(p)p.play(n.m,Math.max(t0+n.t,ac.currentTime),{duration:Math.max(n.d,0.05),gain:Math.min(1,n.v*1.3)});
+  }
+}
+function play(){
+  if(!notes.length||playing)return;ctx();
+  if(off>=dur)off=0;
+  playing=true;t0=ac.currentTime-off;
+  idx=notes.findIndex(function(n){return n.t>=off});if(idx<0)idx=notes.length;
+  timer=setInterval(sched,40);playB.textContent="Pause";
+}
+function pause(){
+  if(!playing)return;
+  off=cur();playing=false;clearInterval(timer);
+  Object.keys(ready).forEach(function(k){ready[k].stop()});
+  playB.textContent="Play";
+}
+playB.onclick=function(){playing?pause():play()};
+stopB.onclick=function(){pause();off=0};
+seek.oninput=function(){var was=playing;pause();off=+seek.value;if(was)play()};
+pick.onchange=function(){load(pick.files[0]);pick.value=""};
+["dragover","dragenter"].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();wrap.classList.add("drag")})});
+["dragleave","drop"].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();wrap.classList.remove("drag")})});
+document.addEventListener("drop",function(e){if(e.dataTransfer.files[0])load(e.dataTransfer.files[0])});
+document.addEventListener("keydown",function(e){if(e.code==="Space"&&!playB.disabled&&e.target.tagName!=="BUTTON"&&e.target.tagName!=="INPUT"){e.preventDefault();playB.click()}});
+
+function draw(){
+  requestAnimationFrame(draw);
+  if(playing&&ac.currentTime-t0>dur+0.4){pause();off=0}
+  var c=cur(),KW=Math.min(64,W*0.14),ph=KW+Math.min(60,(W-KW)*0.2),pps=(W-KW)/7,rows=hi-lo+1,rh=H/rows,act={},i,n,p,y,x,w;
+  g.fillStyle="#000";g.fillRect(0,0,W,H);
+  for(p=lo;p<=hi;p++){
+    y=H-(p-lo+1)*rh;
+    if(BLACK[p%12]){g.fillStyle="#0d0d0d";g.fillRect(KW,y,W-KW,rh)}
+    if(p%12===0){g.fillStyle="#222";g.fillRect(KW,y+rh-1,W-KW,1)}
+  }
+  for(i=0;i<notes.length;i++){
+    n=notes[i];x=ph+(n.t-c)*pps;w=n.d*pps;
+    if(x>W||x+w<KW)continue;
+    y=H-(n.m-lo+1)*rh;
+    var on=n.t<=c&&c<n.t+n.d;
+    if(on)act[n.m]=1;
+    g.fillStyle=on?"#fff":(n.t+n.d<c?"#3a3a3a":"#b8b8b8");
+    var nx=Math.max(x,KW);g.fillRect(nx,y+1,Math.max(2,x+w-nx-1),Math.max(1,rh-2));
+  }
+  for(p=lo;p<=hi;p++){
+    y=H-(p-lo+1)*rh;
+    var bl=BLACK[p%12];
+    g.fillStyle=bl?"#000":(act[p]?"#8f8f8f":"#f2f2f2");g.fillRect(0,y,KW,rh);
+    g.fillStyle="#000";g.fillRect(0,y+rh-1,KW,1);
+    if(bl){g.fillStyle=act[p]?"#fff":"#1a1a1a";g.fillRect(0,y+1,KW*0.62,Math.max(1,rh-2))}
+  }
+  g.fillStyle="#333";g.fillRect(KW,0,1,H);
+  g.fillStyle="rgba(255,255,255,.85)";g.fillRect(ph,0,1,H);
+  if(!seek.matches(":active"))seek.value=c;
+  timeE.textContent=fmt(c)+" / "+fmt(dur);
+}
+resize();draw();
+})();
+</script>
+</body>
+</html>
