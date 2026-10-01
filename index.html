@@ -4,14 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<title>tetomidi: Convert audio to MIDI and play it on a piano roll</title>
-<meta name="description" content="Turn an MP3, a SoundCloud link or a recording into piano or guitar MIDI, then watch it play on a piano roll. Join the tetomidi Discord server and use the bot.">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="tetomidi">
-<meta property="og:image" content="https://tetomidi-pianits.vercel.app/logo.png">
-<meta name="twitter:card" content="summary">
-<meta property="og:title" content="tetomidi: Convert audio to MIDI and play it on a piano roll">
-<meta property="og:description" content="Turn an MP3, a SoundCloud link or a recording into piano or guitar MIDI, then watch it play on a piano roll. Join the tetomidi Discord server and use the bot.">
+<title>tetomidi</title>
+<meta name="description" content="tetomidi: a Discord server, a MIDI player with a piano roll, a MIDI editor, and MP3 to MIDI.">
 <link rel="icon" type="image/png" href="data:image/png;base64,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">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +27,6 @@ a{color:inherit;text-decoration:none}
 /* Màn hình chờ: chạm để logo xuất hiện */
 #splash{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .9s cubic-bezier(.76,0,.24,1),opacity .6s ease .3s}
 #splash.done{transform:translateY(-100%);opacity:0;pointer-events:none}
-#hint{position:absolute;bottom:calc(48px + env(safe-area-inset-bottom,0px));color:var(--mute);font-size:14px;letter-spacing:.04em;transition:opacity .3s}
 #stage{display:flex;flex-direction:column;align-items:center;width:min(78vw,420px);opacity:0}
 #stage.on{opacity:1}
 #stage .logo{width:150px;height:150px;object-fit:contain;transform:scale(.6);opacity:0}
@@ -129,15 +122,6 @@ body::before{content:"";position:fixed;left:-20%;right:-20%;bottom:-30%;height:6
 .steps li{counter-increment:s;display:flex;gap:18px;padding:14px 0;border-bottom:1px solid var(--line);color:#d4d2c9;font-size:16px;line-height:1.5}
 .steps li::before{content:counter(s);flex:none;width:22px;color:var(--mute);font-family:var(--serif);font-size:22px;line-height:1.1}
 
-/* Showcase */
-.showcase .shots{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin:22px calc(-1*max(28px,7vw)) 0;padding:0 max(28px,7vw) 8px;scroll-padding:0 max(28px,7vw);scrollbar-width:none}
-.showcase .shots::-webkit-scrollbar{display:none}
-.showcase figure{flex:none;width:min(82vw,520px);scroll-snap-align:start}
-.showcase figure img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:14px;background:#0a0a0a}
-.showcase figcaption{margin-top:10px;color:var(--mute);font-size:14px}
-.showcase .clips{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,260px));gap:26px;margin-top:22px}
-.showcase .clips figure{width:100%}
-.showcase .clips video{width:100%;aspect-ratio:886/1920;display:block;object-fit:contain;border:1px solid var(--line);border-radius:18px;background:#000}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}
 }
@@ -153,6 +137,7 @@ body::before{content:"";position:fixed;left:-20%;right:-20%;bottom:-30%;height:6
     <div id="list">
       <a href="https://discord.gg/ChU3M3pNX" target="_blank" rel="noopener"><svg class="dcm" aria-hidden="true"><use href="#discord"/></svg>Discord server<small>Join the tetomidi community</small></a>
       <a href="/piano-roll/">MIDI player piano roll<small>Open a MIDI file and watch every note</small></a>
+      <a href="https://tetomidi-editor.vercel.app/" target="_blank" rel="noopener">MIDI editor<small>Write notes or import a MIDI file, then export it</small></a>
       <a href="https://3000-6ab643547112d573ec7470f8--b-4abdb18-371636666b23c1fe.imported.base44-preview.app/" target="_blank" rel="noopener">MP3 to MIDI<small>Turn an MP3 into MIDI, guitar and piano</small></a>
       <a href="#about" id="aboutLink">?<small>About the bot and MP3 to MIDI</small></a>
     </div>
@@ -185,13 +170,14 @@ body::before{content:"";position:fixed;left:-20%;right:-20%;bottom:-30%;height:6
     <div class="links">
       <a href="https://discord.gg/ChU3M3pNX" target="_blank" rel="noopener"><svg class="dc" aria-hidden="true"><use href="#discord"/></svg>Join the Discord server</a>
       <a href="/piano-roll/">Open the MIDI player</a>
+      <a href="https://tetomidi-editor.vercel.app/" target="_blank" rel="noopener">Open the MIDI editor</a>
       <a href="https://3000-6ab643547112d573ec7470f8--b-4abdb18-371636666b23c1fe.imported.base44-preview.app/" target="_blank" rel="noopener">Open MP3 to MIDI</a>
     </div>
   </div>
 
   <section class="more" aria-label="About tetomidi">
     <h2>A small home for MIDI.</h2>
-    <p class="lead">tetomidi puts everything we make with MIDI in one place: a community on Discord, a player that shows every note on a piano roll, and tools that turn recordings into MIDI.</p>
+    <p class="lead">tetomidi puts everything we make with MIDI in one place: a community on Discord, a player that shows every note on a piano roll, an editor to write your own MIDI, and tools that turn recordings into MIDI.</p>
 
     <div class="blk">
       <h3>Discord server</h3>
@@ -203,6 +189,12 @@ body::before{content:"";position:fixed;left:-20%;right:-20%;bottom:-30%;height:6
       <h3>MIDI player</h3>
       <p>Open any MIDI file and watch the notes scroll across a piano roll while it plays with real instrument sounds. Each track uses the instrument saved in the file.</p>
       <a class="tl" href="/piano-roll/">Open the MIDI player</a>
+    </div>
+
+    <div class="blk">
+      <h3>MIDI editor</h3>
+      <p>Draw notes on a piano roll, or import a MIDI file and change it. Pick piano, guitar or drums, then export as MIDI, WAV, MP3, FLAC or M4A.</p>
+      <a class="tl" href="https://tetomidi-editor.vercel.app/" target="_blank" rel="noopener">Open the MIDI editor</a>
     </div>
 
     <div class="blk">
@@ -220,35 +212,15 @@ body::before{content:"";position:fixed;left:-20%;right:-20%;bottom:-30%;height:6
       </ol>
     </div>
   </section>
-  <section class="more showcase" aria-labelledby="sh">
-    <h2 id="sh">See it in action.</h2>
-    <p class="lead">The MP3 to MIDI tool takes a song three ways, and the Discord bot does the same with a short command.</p>
-    <div class="blk">
-      <h3>The MP3 to MIDI tool</h3>
-      <div class="shots">
-        <figure><img src="showcase/upload.jpg" width="1813" height="1006" loading="lazy" alt="MP3 to MIDI tool with the Upload tab open and a drag and drop area for audio files"><figcaption>Upload an audio file</figcaption></figure>
-        <figure><img src="showcase/soundcloud.jpg" width="1861" height="1010" loading="lazy" alt="MP3 to MIDI tool with the SoundCloud tab open and a field for a SoundCloud link"><figcaption>Paste a SoundCloud link</figcaption></figure>
-        <figure><img src="showcase/record.jpg" width="1827" height="1055" loading="lazy" alt="MP3 to MIDI tool with the Record tab open and a Start Recording button"><figcaption>Record with your microphone</figcaption></figure>
-      </div>
-    </div>
-    <div class="blk">
-      <h3>In the Discord server</h3>
-      <div class="clips">
-        <figure><video controls playsinline preload="none" poster="showcase/audio-to-midi.jpg" src="showcase/audio-to-midi.mp4" aria-label="Screen recording: sending an audio file to the Teto Transcriber bot and getting a MIDI file back"></video><figcaption>Audio file to MIDI</figcaption></figure>
-        <figure><video controls playsinline preload="none" poster="showcase/soundcloud-to-midi.jpg" src="showcase/soundcloud-to-midi.mp4" aria-label="Screen recording: sending a SoundCloud link to the Teto Transcriber bot and getting a MIDI file back"></video><figcaption>SoundCloud link to MIDI</figcaption></figure>
-      </div>
-    </div>
-  </section>
 </main>
 <footer class="credit">tetomidi is a website built by xiubell.</footer>
 
-<div id="splash">
+<div id="splash" aria-hidden="true">
   <div id="stage">
     <img class="logo" alt="" data-logo>
     <h1>teto<i>midi</i></h1>
     <div class="bar"><b></b></div>
   </div>
-  <div id="hint"></div>
 </div>
 
 <script>
@@ -256,12 +228,11 @@ var LOGO="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAIAAABC8jL9AAC3
 document.querySelectorAll("[data-logo]").forEach(function(i){i.src=LOGO});
 (function(){
   var splash=document.getElementById('splash'),stage=document.getElementById('stage'),
-      hint=document.getElementById('hint'),burger=document.getElementById('burger'),
+      burger=document.getElementById('burger'),
       menu=document.getElementById('menu'),started=false;
 
   function enter(){
     if(started)return; started=true;
-    hint.style.opacity=0;
     stage.classList.add('on');
     setTimeout(function(){
       splash.classList.add('done');
@@ -269,7 +240,7 @@ document.querySelectorAll("[data-logo]").forEach(function(i){i.src=LOGO});
       document.body.style.overflow='';
     },2200);
   }
-  enter();
+  requestAnimationFrame(enter);
 
   function toggle(open){
     burger.setAttribute('aria-expanded',open);
